@@ -1,0 +1,4 @@
+.idea/
+/.env
+app/test_utils.py
+.utils/chromdriver
