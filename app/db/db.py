@@ -1,7 +1,8 @@
-from sqlalchemy import create_engine, inspect
+from sqlalchemy import create_engine
 from sqlalchemy.engine import cursor
 from sqlalchemy.orm import sessionmaker
 from contextlib import contextmanager
+
 
 url = "sqlite:///./profile.db"
 engine = create_engine(url)
