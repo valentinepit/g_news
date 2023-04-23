@@ -14,7 +14,7 @@ class Cookies(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     created_at = Column(DateTime, default=now())
     cookie = Column(BINARY)
-    last_start_time = Column(DateTime)
+    last_update = Column(DateTime)
     counter = Column(Integer)
 
 

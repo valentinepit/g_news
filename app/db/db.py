@@ -3,13 +3,11 @@ from sqlalchemy.engine import cursor
 from sqlalchemy.orm import sessionmaker
 from contextlib import contextmanager
 
-url = "sqlite:///profile.db"
+url = "sqlite:///./profile.db"
 engine = create_engine(url)
-inspector = inspect(engine)
-# table_names = inspector.get_table_names()
-# print(table_names)
 
 Session = sessionmaker(autoflush=False, bind=engine)
+
 
 @contextmanager
 def new_session(**kwargs) -> Session:
@@ -21,6 +19,7 @@ def new_session(**kwargs) -> Session:
         raise
     else:
         _session.commit()
+
 
 @contextmanager
 def new_cursor(session) -> cursor:
