@@ -1,5 +1,4 @@
 from sqlalchemy import create_engine
-from sqlalchemy.engine import cursor
 from sqlalchemy.orm import sessionmaker
 from contextlib import contextmanager
 
@@ -20,13 +19,3 @@ def new_session(**kwargs) -> Session:
         raise
     else:
         _session.commit()
-
-
-@contextmanager
-def new_cursor(session) -> cursor:
-    cookies_connection = session.connection().connection
-    cursor_instance: cursor = cookies_connection.cursor().__enter__()
-    try:
-        yield cursor_instance
-    finally:
-        cursor_instance.__exit__()
