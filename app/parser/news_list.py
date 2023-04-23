@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def get_news_links():
+def get_news_links() -> list[str]:
     news_links = []
     result = requests.get("https://news.google.com/hom")
     soup = BeautifulSoup(result.text, "html.parser")
