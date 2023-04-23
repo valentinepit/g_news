@@ -2,10 +2,10 @@ import logging
 from multiprocessing import Pool
 from random import randint
 
-from app.parser.loader import NewsViewer
-from app.parser.news_list import get_news_links
 from app.db.db import new_session
 from app.db.models import Profile
+from app.parser.loader import NewsViewer
+from app.parser.news_list import get_news_links
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

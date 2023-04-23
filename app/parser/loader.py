@@ -4,15 +4,14 @@ from datetime import datetime
 from random import randint
 from time import sleep
 
+from app.db.db import new_session
+from app.db.models import Cookies, Profile
 from selenium import webdriver
 from selenium.common import InvalidCookieDomainException, TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from sqlalchemy.orm import Session
-
-from app.db.db import new_session
-from app.db.models import Cookies, Profile
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -36,8 +35,9 @@ class NewsViewer:
         return f"For profile {self.num} loaded news from {self.domain}"
 
     def get_cookies(self, session: Session) -> list[dict]:
-        cookies = session.query(Cookies).filter(Cookies.profile_id == self.num).filter(
-            Cookies.domain == self.domain).all()
+        cookies = (
+            session.query(Cookies).filter(Cookies.profile_id == self.num).filter(Cookies.domain == self.domain).all()
+        )
         if cookies:
             return pickle.loads(cookies[0].cookie)
         return []
@@ -56,7 +56,7 @@ class NewsViewer:
     def navigation(self, session: Session) -> None:
         url = self.base_url + self.url.lstrip("./")
         options = webdriver.ChromeOptions()
-        options.add_argument('disable_infobars')
+        options.add_argument("disable_infobars")
         options.add_argument("headless")
         options.add_argument("window-size=1920x935")
         options.add_argument("--kiosk")
@@ -77,7 +77,8 @@ class NewsViewer:
         self.driver.implicitly_wait(15)
         try:
             WebDriverWait(self.driver, 10).until(
-                EC.element_to_be_clickable((By.ID, ("onetrust-accept-btn-handler")))).click()
+                EC.element_to_be_clickable((By.ID, ("onetrust-accept-btn-handler")))
+            ).click()
         except TimeoutException:
             pass
         page_height = self.driver.execute_script("return document.documentElement.scrollHeight")
@@ -93,13 +94,9 @@ class NewsViewer:
         self.record.last_update = now
         cookies = self.get_cookies(session)
         if not cookies:
-            cookies_instance = Cookies(
-                cookie=ck,
-                domain=self.domain,
-                profile_id=self.record.id
-            )
+            cookies_instance = self.model_cls(cookie=ck, domain=self.domain, profile_id=self.record.id)
             session.add(cookies_instance)
-            logger.info(f"Cookies for {self.num} and {self.domain} created")
+            logger.info(f"Cookies for {self.num} and {self.domain} was created")
         else:
             cookies.cookie = ck
-            logger.info(f"Cookies for {self.num} and {self.domain} updated")
+            logger.info(f"Cookies for {self.num} and {self.domain} was updated")
