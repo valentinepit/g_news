@@ -8,6 +8,7 @@ from app.db.db import new_session
 from app.db.models import Profile
 
 logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 MAX_PROCESS = 5
 
 
@@ -17,7 +18,8 @@ def get_news() -> list[str]:
 
 def create_parser(_link: str, prof: int) -> None:
     viewer = NewsViewer(_link, prof)
-    viewer.load()
+    result = viewer.load()
+    logger.info(result)
 
 
 def get_profiles_from_db() -> list[int]:

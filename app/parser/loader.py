@@ -1,4 +1,4 @@
-import os
+import logging
 import pickle
 from datetime import datetime
 from random import randint
@@ -6,7 +6,6 @@ from time import sleep
 
 from selenium import webdriver
 from selenium.common import InvalidCookieDomainException, TimeoutException
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
@@ -14,6 +13,9 @@ from sqlalchemy.orm import Session
 
 from app.db.db import new_session
 from app.db.models import Cookies, Profile
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 class NewsViewer:
@@ -27,10 +29,11 @@ class NewsViewer:
         self.url = url
         self.num = num
 
-    def load(self):
+    def load(self) -> str:
         with new_session() as session:
             self.record = session.query(Profile).filter(Profile.id == self.num).one()
             self.navigation(session)
+        return f"For profile {self.num} loaded news from {self.domain}"
 
     def get_cookies(self, session: Session) -> list[dict]:
         cookies = session.query(Cookies).filter(Cookies.profile_id == self.num).filter(
@@ -46,16 +49,15 @@ class NewsViewer:
             except InvalidCookieDomainException as e:
                 print(f"{self.domain}\n{e}")
 
-    def get_domain(self, url):
+    def get_domain(self, url: str) -> None:
         self.driver.get(url)
         self.domain = self.driver.current_url.split("/")[2]
 
     def navigation(self, session: Session) -> None:
         url = self.base_url + self.url.lstrip("./")
-        # s = Service(os.environ["CHROMEDRIVER_PATH"])
         options = webdriver.ChromeOptions()
         options.add_argument('disable_infobars')
-        # options.add_argument("headless")
+        options.add_argument("headless")
         options.add_argument("window-size=1920x935")
         options.add_argument("--kiosk")
         options.add_argument("--log-level=3")
@@ -84,7 +86,7 @@ class NewsViewer:
             sleep(randint(0, 5))
             scroll_position += 400
 
-    def update_cookies(self, session) -> None:
+    def update_cookies(self, session: Session) -> None:
         ck = pickle.dumps(self.driver.get_cookies())
         now = datetime.now()
         self.record.counter = self.record.counter + 1
@@ -97,5 +99,7 @@ class NewsViewer:
                 profile_id=self.record.id
             )
             session.add(cookies_instance)
+            logger.info(f"Cookies for {self.num} and {self.domain} created")
         else:
             cookies.cookie = ck
+            logger.info(f"Cookies for {self.num} and {self.domain} updated")
