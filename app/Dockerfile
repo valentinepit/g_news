@@ -10,7 +10,6 @@ COPY ./requirements.txt .
 RUN pip install -r requirements.txt
 
 COPY . .
-RUN python db/models.py
 CMD ["python", "main.py"]
 
 

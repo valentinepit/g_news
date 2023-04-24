@@ -43,11 +43,12 @@ class NewsViewer:
         return []
 
     def add_cookies(self, cookie: list[dict]) -> None:
+        logger.info(f"starting cookies adding")
         for item in cookie:
             try:
                 self.driver.add_cookie(item)
             except InvalidCookieDomainException as e:
-                print(f"{self.domain}\n{e}")
+                logger.warning(f"{self.domain}\n{e}")
 
     def get_domain(self, url: str) -> None:
         self.driver.get(url)
@@ -57,7 +58,7 @@ class NewsViewer:
         url = self.base_url + self.url.lstrip("./")
         options = webdriver.ChromeOptions()
         options.add_argument("disable_infobars")
-        # options.add_argument("headless")
+        options.add_argument("headless")
         options.add_argument("window-size=1920x935")
         options.add_argument("--kiosk")
         options.add_argument("--log-level=3")
@@ -88,6 +89,7 @@ class NewsViewer:
             scroll_position += 400
 
     def update_cookies(self, session: Session) -> None:
+        logger.info(f"starting cookies updating")
         ck = pickle.dumps(self.driver.get_cookies())
         now = datetime.now()
         self.record.counter = self.record.counter + 1

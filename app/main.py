@@ -29,6 +29,7 @@ def get_profiles_from_db() -> list[int]:
 
 
 def news_reader(profiles: list[int], news: list[str]) -> None:
+    logger.info(f"Profiles quantities {len(profiles)}")
     while profiles:
         if len(profiles) >= MAX_PROCESS:
             active_profiles = profiles[:MAX_PROCESS]
