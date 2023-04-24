@@ -1,0 +1,37 @@
+version: "3.11"
+
+x-common:
+  &base-image
+  build:
+    dockerfile: Dockerfile
+    context: .
+  image: news-bot_back:latest
+  restart: always
+  env_file:
+    - .env
+
+services:
+  g_news:
+    build: ./app
+    env_file:
+      - .env
+    links:
+      - chromedriver
+
+  chromedriver:
+    image: selenium/standalone-chrome
+    hostname: chromedriver:4444
+
+    #  db:
+    #    container_name: sqlite3_container
+    #    image: nouchka/sqlite3:latest
+    #    stdin_open: true
+    #    ports:
+    #      - "1433:1433"
+    #    tty: true
+    #    volumes:
+    #      - ./profile.db: /app/profile.db
+    #    restart: unless-stopped
+    #
+    #volumes:
+    #  db:

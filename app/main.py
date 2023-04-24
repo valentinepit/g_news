@@ -2,10 +2,10 @@ import logging
 from multiprocessing import Pool
 from random import randint
 
-from app.db.db import new_session
-from app.db.models import Profile
-from app.parser.loader import NewsViewer
-from app.parser.news_list import get_news_links
+from db.db import new_session
+from db.models import Profile
+from parser.loader import NewsViewer
+from parser.news_list import get_news_links
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -46,6 +46,7 @@ def news_reader(profiles: list[int], news: list[str]) -> None:
 
 def main() -> None:
     news = get_news()
+    logger.info(f"\n New count = {len(news)}\n")
     profiles = get_profiles_from_db()
     news_reader(profiles, news)
 

@@ -4,8 +4,8 @@ from datetime import datetime
 from random import randint
 from time import sleep
 
-from app.db.db import new_session
-from app.db.models import Cookies, Profile
+from db.db import new_session
+from db.models import Cookies, Profile
 from selenium import webdriver
 from selenium.common import InvalidCookieDomainException, TimeoutException
 from selenium.webdriver.common.by import By
@@ -57,7 +57,7 @@ class NewsViewer:
         url = self.base_url + self.url.lstrip("./")
         options = webdriver.ChromeOptions()
         options.add_argument("disable_infobars")
-        options.add_argument("headless")
+        # options.add_argument("headless")
         options.add_argument("window-size=1920x935")
         options.add_argument("--kiosk")
         options.add_argument("--log-level=3")
