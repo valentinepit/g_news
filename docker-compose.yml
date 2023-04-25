@@ -15,23 +15,26 @@ services:
     build: ./app
     env_file:
       - .env
-    links:
-      - chromedriver
+#    links:
+#      - chromedriver
 
-  chromedriver:
-    image: selenium/standalone-chrome
-    hostname: chromedriver:4444
+#  chromedriver:
+#    image: selenium/standalone-chrome
+#    hostname: chromedriver:4444
+  chrome:
+    image: selenium/node-chrome:beta
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
 
-    #  db:
-    #    container_name: sqlite3_container
-    #    image: nouchka/sqlite3:latest
-    #    stdin_open: true
-    #    ports:
-    #      - "1433:1433"
-    #    tty: true
-    #    volumes:
-    #      - ./profile.db: /app/profile.db
-    #    restart: unless-stopped
-    #
-    #volumes:
-    #  db:
+  selenium-hub:
+    image: selenium/hub:latest
+    container_name: selenium-hub
+    ports:
+      - "4442:4442"
+      - "4443:4443"
+      - "4444:4444"

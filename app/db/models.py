@@ -25,5 +25,3 @@ class Cookies(Base):
     domain = Column(String)
     profile_id = Column(Integer, ForeignKey("profile.id"))
 
-
-Base.metadata.create_all(bind=engine)

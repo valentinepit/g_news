@@ -8,6 +8,7 @@ from db.db import new_session
 from db.models import Cookies, Profile
 from selenium import webdriver
 from selenium.common import InvalidCookieDomainException, TimeoutException
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
@@ -16,6 +17,12 @@ from sqlalchemy.orm import Session
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+def interceptor(request):
+    del request.headers["Referer"]
+    request.headers["Referer"] = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        "(KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36"
+    }
 
 class NewsViewer:
     model_cls = Cookies
@@ -51,26 +58,36 @@ class NewsViewer:
                 logger.warning(f"{self.domain}\n{e}")
 
     def get_domain(self, url: str) -> None:
+        logger.info(f"news domain {url}")
         self.driver.get(url)
         self.domain = self.driver.current_url.split("/")[2]
 
     def navigation(self, session: Session) -> None:
+
         url = self.base_url + self.url.lstrip("./")
         options = webdriver.ChromeOptions()
-        options.add_argument("disable_infobars")
         options.add_argument("headless")
         options.add_argument("window-size=1920x935")
         options.add_argument("--kiosk")
         options.add_argument("--log-level=3")
         try:
-            self.driver = webdriver.Chrome(chrome_options=options)
+            self.driver = webdriver.Remote(
+                command_executor="http://chromedriver:4444/wd/hub",
+                desired_capabilities=DesiredCapabilities.CHROME,
+                options=options,
+            )
+            logger.info(f"{self.driver}")
+            self.driver.request_interceptor = interceptor
             self.get_domain(url)
             cookie = self.get_cookies(session)
             self.add_cookies(cookie)
             self.driver.get(url)
             self.news_viewer()
             self.update_cookies(session)
+        except WebDriverException as e:
+            logger.info(f"Can't get webdriver: {e}")
         finally:
+            logger.info("Driver closed")
             self.driver.close()
 
     def news_viewer(self) -> None:

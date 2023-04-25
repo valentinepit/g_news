@@ -2,6 +2,7 @@ import logging
 from multiprocessing import Pool
 from random import randint
 
+from db.create_db import create_db
 from db.db import new_session
 from db.models import Profile
 from parser.loader import NewsViewer
@@ -46,6 +47,7 @@ def news_reader(profiles: list[int], news: list[str]) -> None:
 
 
 def main() -> None:
+    create_db()
     news = get_news()
     logger.info(f"\n New count = {len(news)}\n")
     profiles = get_profiles_from_db()
