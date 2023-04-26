@@ -73,10 +73,9 @@ class NewsViewer:
         try:
             self.driver = webdriver.Remote(
                 command_executor="http://chromedriver:4444/wd/hub",
-                desired_capabilities=DesiredCapabilities.CHROME,
+                desired_capabilities=webdriver.DesiredCapabilities.CHROME,
                 options=options,
             )
-            logger.info(f"{self.driver}")
             self.driver.request_interceptor = interceptor
             self.get_domain(url)
             cookie = self.get_cookies(session)
@@ -87,10 +86,11 @@ class NewsViewer:
         except WebDriverException as e:
             logger.info(f"Can't get webdriver: {e}")
         finally:
-            logger.info("Driver closed")
+            logger.info(f"{self.driver = }Driver closed")
             self.driver.close()
 
     def news_viewer(self) -> None:
+        logger.info(f"Scrolling page {self.driver.current_url}")
         scroll_position = 0
         self.driver.implicitly_wait(15)
         try:
